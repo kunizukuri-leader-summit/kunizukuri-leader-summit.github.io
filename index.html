@@ -287,6 +287,8 @@
   .tl-item.sitter .tag{background:#eef3f5;color:#466b7d;margin-left:0;margin-right:8px}
   .meal-sitter{margin:9px 0 0;font-size:13.5px;line-height:1.7;color:var(--color-text)}
   .meal-sitter .mm-tag{background:#7E9CA9;color:#fff}
+  .meal-staff{margin:9px 0 0;font-size:13.5px;line-height:1.7;color:var(--color-text)}
+  .meal-staff .mm-tag{background:#7E9CA9;color:#fff}
   button.evname{background:none;border:0;font:inherit;font-weight:800;color:var(--color-text);cursor:pointer;padding:0;min-height:0;text-decoration:underline;text-decoration-color:var(--line-strong);text-underline-offset:3px}
   button.evname:hover{color:var(--accent-deep)}
 
@@ -490,6 +492,8 @@
     .tl-item.sitter .tag{background:#f2f7f9;color:#466b7d}
     .meal-sitter{color:#2e2e2e}
     .meal-sitter .mm-tag{background:#7E9CA9;color:#ffffff}
+    .meal-staff{color:#2e2e2e}
+    .meal-staff .mm-tag{background:#7E9CA9;color:#ffffff}
     button.evname{color:#2e2e2e;text-decoration-color:#d8d5cf}
     button.evname:hover{color:#b3261e}
     .sc-list::before{background:#e8e6e1}
@@ -2038,6 +2042,12 @@ var DATA = {
    "days": ["2026-11-21"],
    "meals": []
   }
+ ],
+ "staff": [
+  {
+   "name": "まさや",
+   "meals": ["11/19 夜ご飯", "11/20 夜ご飯", "11/21 夜ご飯"]
+  }
  ]
 }
 </script>
@@ -2347,6 +2357,11 @@ DATA.people.forEach(function(p,i){
     (DATA.sitters||[]).forEach(function(s){ if((s.meals||[]).indexOf(label)>=0) names.push(s.name); });
     return names;
   }
+  function staffNamesFor(label){
+    var names=[];
+    (DATA.staff||[]).forEach(function(s){ if((s.meals||[]).indexOf(label)>=0) names.push(s.name); });
+    return names;
+  }
   var wrap=document.getElementById("tlDays");
 
   dayDefs.forEach(function(day){
@@ -2394,7 +2409,7 @@ DATA.people.forEach(function(p,i){
         items+='<li class="tl-item meal"><span class="time">'+esc(en.time)+'</span><span class="dot"></span>'
           +'<div class="meal-main"><button type="button" class="meal-head" aria-expanded="false">'+esc(en.text)
           +'<span class="meal-chip">予定'+en.sum.count+'名</span><span class="meal-chev">›</span></button>'
-          +'<div class="meal-body" hidden>'+mealBodyHtml(en.label, en.sum, sitterNamesFor(en.label))+'</div></div></li>';
+          +'<div class="meal-body" hidden>'+mealBodyHtml(en.label, en.sum, sitterNamesFor(en.label), staffNamesFor(en.label))+'</div></div></li>';
       } else if(en.kind==="sitter"){
         items+='<li class="tl-item sitter"><span class="time"></span><span class="dot"></span>'
           +'<span class="txt"><span class="tag sitter">シッター</span>'+esc(en.name)+'</span></li>';
@@ -2447,7 +2462,7 @@ DATA.people.forEach(function(p,i){
 })();
 
 /* ---------- schedule tab（縦ライン＋ドット / 食事はアコーディオン） ---------- */
-function mealBodyHtml(label, sum, sitterNames){
+function mealBodyHtml(label, sum, sitterNames, staffNames){
   var html='<div class="meal-eaters">'+sum.eaters.map(function(n){ return esc(n); }).join("、")+'</div>';
   if(sum.notEating && sum.notEating.length){
     html+='<div class="meal-noteating"><p class="meal-noteating-head">食べない人</p><p class="meal-noteating-list">'
@@ -2459,6 +2474,9 @@ function mealBodyHtml(label, sum, sitterNames){
   }
   if(sitterNames && sitterNames.length){
     html+='<p class="meal-sitter"><span class="mm-tag">シッター</span>'+sitterNames.map(function(n){ return esc(n); }).join("、")+'</p>';
+  }
+  if(staffNames && staffNames.length){
+    html+='<p class="meal-staff"><span class="mm-tag">スタッフ</span>'+staffNames.map(function(n){ return esc(n); }).join("、")+'</p>';
   }
   var note=(DATA.mealNotes||{})[label];
   if(note) html+='<p class="meal-note">※ '+esc(note)+'</p>';
